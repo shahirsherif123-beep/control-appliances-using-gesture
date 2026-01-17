@@ -46,4 +46,3 @@ void loop() {
 
   lastTiltState = tiltState;
 }
-// use this code to dump the program in arduino uno board
