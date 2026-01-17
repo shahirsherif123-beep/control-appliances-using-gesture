@@ -1,0 +1,49 @@
+#define TILT_PIN 2
+#define LED_PIN 8
+#define BUZZER 9
+
+bool systemUnlocked = false;
+bool applianceState = false;
+
+int gestureCount = 0;
+int lastTiltState = HIGH;
+
+void setup() {
+  pinMode(TILT_PIN, INPUT_PULLUP);
+  pinMode(LED_PIN, OUTPUT);
+  pinMode(BUZZER, OUTPUT);
+
+  Serial.begin(9600);
+  Serial.println("System Locked");
+}
+
+void loop() {
+  int tiltState = digitalRead(TILT_PIN);
+
+  // Detect gesture (edge detection)
+  if (tiltState == LOW && lastTiltState == HIGH) {
+    tone(BUZZER, 1000, 150);
+
+    if (!systemUnlocked) {
+      gestureCount++;
+      Serial.print("Unlock Gesture Count: ");
+      Serial.println(gestureCount);
+
+      if (gestureCount == 3) {
+        systemUnlocked = true;
+        Serial.println("System Unlocked!");
+        tone(BUZZER, 2000, 300);
+      }
+    }
+    else {
+      applianceState = !applianceState;
+      digitalWrite(LED_PIN, applianceState);
+
+      Serial.println(applianceState ? "Appliance ON" : "Appliance OFF");
+    }
+    delay(500); // debounce
+  }
+
+  lastTiltState = tiltState;
+}
+// use this code to dump the program in arduino uno board
